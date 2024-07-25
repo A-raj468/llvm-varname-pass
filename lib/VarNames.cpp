@@ -1,4 +1,5 @@
 #include "VarNames.h"
+#include "llvm/Transforms/Utils/InstructionNamer.h"
 
 using namespace llvm;
 using namespace varnames;
@@ -8,6 +9,13 @@ PreservedAnalyses VarNamesPass::run(Module &M, ModuleAnalysisManager &AM) {
         errs() << "Global variable: ";
         G.printAsOperand(errs(), false);
         errs() << "\n";
+    }
+
+    // First, run the InstNamer pass
+    InstructionNamerPass InstNamer;
+    for (Function &F : M) {
+        FunctionAnalysisManager FAM;
+        InstNamer.run(F, FAM);
     }
 
     for (auto &F : M) {
