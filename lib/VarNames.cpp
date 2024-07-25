@@ -1,22 +1,32 @@
 #include "VarNames.h"
-#include "llvm/IR/PassManager.h"
 
 using namespace llvm;
-using namespace hw;
+using namespace varnames;
 
-PreservedAnalyses VarNamesPass::run(Module& M, ModuleAnalysisManager& AM) {
-    for (auto& G : M.globals()) {
-        errs() << "Global variable: " << G.getName() << "\n";
+PreservedAnalyses VarNamesPass::run(Module &M, ModuleAnalysisManager &AM) {
+    for (auto &G : M.globals()) {
+        errs() << "Global variable: ";
+        G.printAsOperand(errs(), false);
+        errs() << "\n";
     }
 
-    for (auto& F : M) {
-        for (auto& BB : F) {
-            for (auto& I : BB) {
-                if (auto* AI = dyn_cast<AllocaInst>(&I)) {
-                    for (auto op = AI->op_begin(); op != AI->op_end(); op++) {
-                        errs() << " Local variable: " << op->get()->getName()
-                               << "\n";
-                    }
+    for (auto &F : M) {
+        if (F.isDeclaration() || F.isIntrinsic()) {
+            continue;
+        } // Skip declarations and built-in functions
+
+        errs() << "Function: " << F.getName() << "\n";
+        for (auto &Arg : F.args()) {
+            errs() << "  Argument: ";
+            Arg.printAsOperand(errs(), false);
+            errs() << "\n";
+        }
+        for (auto &BB : F) {
+            for (auto &I : BB) {
+                if (auto *AI = dyn_cast<AllocaInst>(&I)) {
+                    errs() << "  Local variable: ";
+                    AI->printAsOperand(errs(), false);
+                    errs() << "\n";
                 }
             }
         }
@@ -28,13 +38,9 @@ extern "C" LLVM_ATTRIBUTE_WEAK PassPluginLibraryInfo llvmGetPassPluginInfo() {
     return {.APIVersion = LLVM_PLUGIN_API_VERSION,
             .PluginName = "varnames",
             .PluginVersion = "v0.1",
-            .RegisterPassBuilderCallbacks = [](PassBuilder& PB) {
-                PB.registerPipelineStartEPCallback(
-                    [](ModulePassManager& MPM, OptimizationLevel Level) {
-                        MPM.addPass(VarNamesPass());
-                    });
+            .RegisterPassBuilderCallbacks = [](PassBuilder &PB) {
                 PB.registerPipelineParsingCallback(
-                    [](StringRef Name, ModulePassManager& MPM,
+                    [](StringRef Name, ModulePassManager &MPM,
                        ArrayRef<PassBuilder::PipelineElement>) -> bool {
                         if (Name == "print-var-names") {
                             MPM.addPass(VarNamesPass());

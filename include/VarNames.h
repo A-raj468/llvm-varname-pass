@@ -8,13 +8,13 @@
 
 using namespace llvm;
 
-namespace hw {
+namespace varnames {
 
 class VarNamesPass : public PassInfoMixin<VarNamesPass> {
   public:
-    PreservedAnalyses run(Module& F, ModuleAnalysisManager& AM);
+    PreservedAnalyses run(Module &F, ModuleAnalysisManager &AM);
 };
 
-} // namespace hw
+} // namespace varnames
 
 #endif // LLVM_TRANSFORMS_HELLONEW_HELLOWORLD_H

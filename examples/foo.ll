@@ -1,5 +1,5 @@
-; ModuleID = 'foo.c'
-source_filename = "foo.c"
+; ModuleID = 'examples/foo.c'
+source_filename = "examples/foo.c"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
@@ -10,26 +10,31 @@ define dso_local i32 @foo(i32 noundef %0, i32 noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
+  %6 = alloca i8, align 1
   store i32 %0, ptr %4, align 4
   store i32 %1, ptr %5, align 4
-  %6 = load i32, ptr %4, align 4
-  %7 = load i32, ptr %5, align 4
-  %8 = icmp sgt i32 %6, %7
-  br i1 %8, label %9, label %11
+  %7 = load i32, ptr %4, align 4
+  %8 = load i32, ptr %5, align 4
+  %9 = icmp sgt i32 %7, %8
+  %10 = zext i1 %9 to i8
+  store i8 %10, ptr %6, align 1
+  %11 = load i8, ptr %6, align 1
+  %12 = trunc i8 %11 to i1
+  br i1 %12, label %13, label %15
 
-9:                                                ; preds = %2
-  %10 = load i32, ptr %4, align 4
-  store i32 %10, ptr %3, align 4
-  br label %13
+13:                                               ; preds = %2
+  %14 = load i32, ptr %4, align 4
+  store i32 %14, ptr %3, align 4
+  br label %17
 
-11:                                               ; preds = %2
-  %12 = load i32, ptr %5, align 4
-  store i32 %12, ptr %3, align 4
-  br label %13
+15:                                               ; preds = %2
+  %16 = load i32, ptr %5, align 4
+  store i32 %16, ptr %3, align 4
+  br label %17
 
-13:                                               ; preds = %11, %9
-  %14 = load i32, ptr %3, align 4
-  ret i32 %14
+17:                                               ; preds = %15, %13
+  %18 = load i32, ptr %3, align 4
+  ret i32 %18
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
@@ -37,11 +42,17 @@ define dso_local i32 @main(i32 noundef %0, ptr noundef %1) #0 {
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
   %5 = alloca ptr, align 8
+  %6 = alloca i32, align 4
+  %7 = alloca i32, align 4
   store i32 0, ptr %3, align 4
   store i32 %0, ptr %4, align 4
   store ptr %1, ptr %5, align 8
-  %6 = call i32 @foo(i32 noundef 1, i32 noundef 2)
-  %7 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %6)
+  store i32 10, ptr %6, align 4
+  store i32 23, ptr %7, align 4
+  %8 = load i32, ptr %6, align 4
+  %9 = load i32, ptr %7, align 4
+  %10 = call i32 @foo(i32 noundef %8, i32 noundef %9)
+  %11 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %10)
   ret i32 0
 }
 
