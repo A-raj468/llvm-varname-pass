@@ -24,6 +24,12 @@ git clone git@github.com:A-raj468/llvm-varname-pass.git
 
 ### Build the project
 
+Before building set the path to your llvm build directory.
+
+```bash
+export LLVM_HOME=path/to/llvm/build/directory
+```
+
 Navigate to the project director.
 
 ```bash
