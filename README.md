@@ -14,6 +14,15 @@ This LLVM pass prints out the variable names used in a program.
 
 ## Getting started
 
+> [!Important]
+> Please ensure that you are using llvm version 20 as this project has been tested using llvm version 20 libraries
+> You can check your llvm version using `llvm-config --version`
+>
+> ```console
+> ❯ llvm-config --version
+> 20.0.0git
+> ```
+
 ### Clone the repository
 
 Clone the project using the following command:

@@ -1,4 +1,8 @@
 #include "VarNames.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
 #include "llvm/Transforms/Utils/InstructionNamer.h"
 
 using namespace llvm;
